@@ -7,7 +7,7 @@ from telegram import Bot
 # Configurações do bot
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
-URL_BACBO = "https://www.betano.bet.br/casino/live/games/bac-bo/5605/tables/"
+URL_BACBO = os.environ.get("BACBO_URL")
 
 bot = Bot(token=TELEGRAM_TOKEN)
 
