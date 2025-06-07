@@ -1,159 +1,76 @@
-
 import streamlit as st
-import requests
+import pandas as pd
+import random
 import time
-import datetime
-from collections import deque
-
-# === CONFIGURAÇÕES ===
-st.set_page_config(page_title="BODINHO - BAC BO", layout="centered", initial_sidebar_state="auto")
-
-# Tema escuro
-st.markdown("""
-    <style>
-    body {
-        background-color: #0e1117;
-        color: #f1f1f1;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# Variáveis globais
-telegram_token = "8084723198:AAGDxbmNHaRMoJ8k5ciPOhLbRFDUOS0toko"
-telegram_chat_id = "-1002740925115"
-
-# Simulação do scraping (depois será substituído pela leitura real do site da Betano)
-def simular_resultado():
-    import random
-    return random.choice(["Player", "Banker", "Tie"])
-
-# Função para enviar alerta via Telegram
-def enviar_telegram(mensagem):
-    url = f"https://api.telegram.org/bot{telegram_token}/sendMessage"
-    data = {"chat_id": telegram_chat_id, "text": mensagem}
-    requests.post(url, data=data)
-
-# Detectar padrões nos últimos resultados
-def detectar_padroes(lista):
-    if len(lista) < 6:
-        return
-
-    ultimos = list(lista)[-6:]
-
-    # Alternância de cores
-    if all(a != b for a, b in zip(ultimos, ultimos[1:])):
-        enviar_telegram("🔁 Alternância detectada no Bac Bo!")
-
-    # Repetições
-    if ultimos.count(ultimos[-1]) >= 5:
-        enviar_telegram(f"🔥 Repetição de {ultimos[-1]} (5x ou mais)!")
-
-    # Padrões numéricos básicos (exemplo)
-    padroes_exemplo = [
-        ["Player", "Player", "Banker", "Player", "Player"],
-        ["Player", "Player", "Banker", "Banker"],
-        ["Banker", "Banker", "Banker", "Player", "Player", "Player"]
-    ]
-
-    for padrao in padroes_exemplo:
-        if ultimos[-len(padrao):] == padrao:
-            enviar_telegram(f"⚠️ Padrão detectado: {padrao}")
-            break
-
-# Início do app
-st.title("🎲 BODINHO - BAC BO")
-st.subheader("Sinais automáticos com scraping e alertas via Telegram")
-
-# Histórico
-if "resultados" not in st.session_state:
-    st.session_state.resultados = deque(maxlen=100)
-
-# Botão para simular entrada
-if st.button("🎯 Adicionar resultado (simulação)"):
-    resultado = simular_resultado()
-    st.session_state.resultados.append(resultado)
-    st.success(f"Resultado adicionado: {resultado}")
-    detectar_padroes(st.session_state.resultados)
-
-# Mostrar últimos resultados
-st.markdown("### Últimos resultados:")
-st.write(list(st.session_state.resultados)[-20:])
-import streamlit as st
 import requests
-import time
-import datetime
-from collections import deque
+from datetime import datetime
 
-# === CONFIGURAÇÕES ===
-st.set_page_config(page_title="BODINHO - BAC BO", layout="centered", initial_sidebar_state="auto")
+# ✅ Isso precisa estar antes de qualquer outro comando do Streamlit
+st.set_page_config(
+    page_title="BODINHO - BAC BO",
+    layout="centered",
+    initial_sidebar_state="auto"
+)
 
-# Tema escuro
-st.markdown("""
-    <style>
-    body {
-        background-color: #0e1117;
-        color: #f1f1f1;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# ----------------------------
+# Configurações iniciais
+# ----------------------------
+st.markdown("<h1 style='text-align: center; color: white;'>🎲 BODINHO - BAC BO</h1>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align: center; color: gray;'>Sinais automáticos via Telegram • Padrões inteligentes • Tema escuro</h4>", unsafe_allow_html=True)
 
-# Variáveis globais
-telegram_token = "8084723198:AAGDxbmNHaRMoJ8k5ciPOhLbRFDUOS0toko"
-telegram_chat_id = "-1002740925115"
+# Emojis personalizados
+EMOJIS = {"Player": "🔴", "Banker": "🔵", "Tie": "🟤"}
 
-# Simulação do scraping (depois será substituído pela leitura real do site da Betano)
-def simular_resultado():
-    import random
-    return random.choice(["Player", "Banker", "Tie"])
-
-# Função para enviar alerta via Telegram
-def enviar_telegram(mensagem):
-    url = f"https://api.telegram.org/bot{telegram_token}/sendMessage"
-    data = {"chat_id": telegram_chat_id, "text": mensagem}
-    requests.post(url, data=data)
-
-# Detectar padrões nos últimos resultados
-def detectar_padroes(lista):
-    if len(lista) < 6:
-        return
-
-    ultimos = list(lista)[-6:]
-
-    # Alternância de cores
-    if all(a != b for a, b in zip(ultimos, ultimos[1:])):
-        enviar_telegram("🔁 Alternância detectada no Bac Bo!")
-
-    # Repetições
-    if ultimos.count(ultimos[-1]) >= 5:
-        enviar_telegram(f"🔥 Repetição de {ultimos[-1]} (5x ou mais)!")
-
-    # Padrões numéricos básicos (exemplo)
-    padroes_exemplo = [
-        ["Player", "Player", "Banker", "Player", "Player"],
-        ["Player", "Player", "Banker", "Banker"],
-        ["Banker", "Banker", "Banker", "Player", "Player", "Player"]
-    ]
-
-    for padrao in padroes_exemplo:
-        if ultimos[-len(padrao):] == padrao:
-            enviar_telegram(f"⚠️ Padrão detectado: {padrao}")
-            break
-
-# Início do app
-st.title("🎲 BODINHO - BAC BO")
-st.subheader("Sinais automáticos com scraping e alertas via Telegram")
-
-# Histórico
+# Simulação de resultados (modo demo)
 if "resultados" not in st.session_state:
-    st.session_state.resultados = deque(maxlen=100)
+    st.session_state.resultados = []
 
-# Botão para simular entrada
-if st.button("🎯 Adicionar resultado (simulação)"):
-    resultado = simular_resultado()
+# Função para gerar uma nova rodada simulada (modo demonstração)
+def simular_resultado():
+    resultado = random.choice(["Player", "Banker", "Tie"])
     st.session_state.resultados.append(resultado)
-    st.success(f"Resultado adicionado: {resultado}")
-    detectar_padroes(st.session_state.resultados)
+    return resultado
 
-# Mostrar últimos resultados
-st.markdown("### Últimos resultados:")
-st.write(list(st.session_state.resultados)[-20:])
+# Envio de sinal para Telegram
+def enviar_sinal(cor, v_mg0, v_mg1, assertividade, red=False):
+    token = "8084723198:AAGDxbmNHaRMoJ8k5ciPOhLbRFDUOS0toko"
+    chat_id = "-1002740925115"
+
+    if red:
+        mensagem = f"{EMOJIS[cor]} SINAL RED ❌\nÚltima entrada: {cor}"
+    else:
+        mensagem = (
+            f"{EMOJIS[cor]} ENTRADA IDENTIFICADA: {cor.upper()}\n\n"
+            f"✅ Vitórias sem martingale: {v_mg0}\n"
+            f"🌀 Vitórias com martingale: {v_mg1}\n"
+            f"📈 Assertividade: {assertividade:.2f}%"
+        )
+
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    requests.post(url, json={"chat_id": chat_id, "text": mensagem})
+
+# Botões manuais
+col1, col2, col3 = st.columns(3)
+if col1.button("🔄 Resetar"):
+    st.session_state.resultados = []
+if col2.button("⚡ Forçar rodada"):
+    novo = simular_resultado()
+    st.success(f"Rodada: {novo}")
+if col3.button("🚀 Modo Turbo"):
+    for _ in range(10):
+        simular_resultado()
+    st.success("Modo Turbo ativado")
+
+# Exibir últimas rodadas
+st.markdown("---")
+st.subheader("📊 Últimos resultados")
+st.write(st.session_state.resultados[-20:][::-1])
+
+# Placeholder para padrões detectados
+st.markdown("---")
+st.subheader("🔍 Padrões Detectados")
+st.info("Modo demonstração ativo. Detecção automática de padrões ao vivo será ativada em breve.")
+
+# Exibir rodapé
+st.markdown("---")
+st.caption("Desenvolvido para uso pessoal | BODINHO - BAC BO")
