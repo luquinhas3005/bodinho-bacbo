@@ -25,12 +25,11 @@ def extrair_resultado():
         print("Erro ao extrair:", e)
     return None
 
-def detectar_padrões(historico):
+def detectar_padroes(historico):
     sinais = []
     if len(historico) < 5:
         return sinais
 
-    # Exemplo: alternância de cores
     padrao = historico[-3:]
     if padrao[0] != padrao[1] and padrao[1] != padrao[2]:
         sinais.append("Alternância detectada")
@@ -50,16 +49,16 @@ def principal():
     while True:
         resultado = extrair_resultado()
 
-if resultados:
-    for resultado in resultados:
-        # processa normalmente
-else:
-    print("⚠️ Nenhum resultado encontrado. Retornou None.")
+        if resultado and resultado != último_resultado:
+            último_resultado = resultado
+            resultados.append(resultado)
 
-            sinais = detectar_padrões(resultados)
+            sinais = detectar_padroes(resultados)
             for sinal in sinais:
                 mensagem = f"🔔 {sinal}\nÚltimo: {resultado}"
                 enviar_sinal(mensagem)
+        elif resultado is None:
+            print("⚠️ Nenhum resultado encontrado. Retornou None.")
 
         time.sleep(10)
 
