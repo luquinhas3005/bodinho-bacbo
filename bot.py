@@ -50,7 +50,7 @@ def principal():
     while True:
         resultado = extrair_resultado()
 
-        if resultados:
+if resultados:
     for resultado in resultados:
         # processa normalmente
 else:
