@@ -50,9 +50,11 @@ def principal():
     while True:
         resultado = extrair_resultado()
 
-        if resultado and resultado != último_resultado:
-            último_resultado = resultado
-            resultados.append(resultado)
+        if resultados:
+    for resultado in resultados:
+        # processa normalmente
+else:
+    print("⚠️ Nenhum resultado encontrado. Retornou None.")
 
             sinais = detectar_padrões(resultados)
             for sinal in sinais:
